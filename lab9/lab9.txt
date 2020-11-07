@@ -1,9 +1,11 @@
 QUESTION 1.  Read through the program lab9.bin. What do you expect the program to do? More specifically, which register will the program modify when it is run, and what will it contain when the program finishes? (You can probably figure this out merely by reading the comments provided in lab9.bin.)
 
-ANSWER: 
+ANSWER:  In the second line, the opcode is 0101 which means that it should AND 00000 with the contents of R2, which means that R2 is being cleared. The third line has the opcode 0001 which is ADD. 
+It adds the decimal value (01100-12) to the contents of R2, and stores the result in R2. The program then stops, which means that the value 12 should be stored in R2. 
 
 
 QUESTION 2.  Explain in a few sentences why the ability to step through a program (run one instruction at a time) is a very useful tool for debugging a program. Debugging is the process of finding and correcting bugs (or errors) in a program. Hint: Finding a bug is often much more difficult than correcting it.
 
-ANSWER: 
+ANSWER: The ability to go through a program one step at a time allows you to find the exact step at which there is an error so that it can be corrected. 
+If you couldn't debug, it would not be easy to find the exact cause of the errors. 
 
