@@ -1,8 +1,32 @@
-; This is the file you will use for the lab assignment
-; Make sure to comment your code properly and don't exceed 
-; the line limitation for this assignment.  Good luck!
+; Name: Manogna Rajanala 
+; Date: 11/13/20
+; Given a set of 10 integer values, 
+; the program checks in order to see if a
+; value is negative. If so, it moves to the
+; next value. It adds all the positive values in 
+; the set of 10 integers.
+
+; R3 points to the place in memory where the value 
+; being checked is
+; R4 keeps track of how many numbers are checked
+; R5 keeps track of the sum of the integers
+; R1 is used to load the value from the location
+; in R3 to check if the value is pos/neg
 
 0011 0001 0000 0000 ; x3100 - starting address of the program
+1110 011 000110001  ; R3<--x3132 -  the location of the 1st integer into R3
+0101 100 100 1 00000 ; R4<--0	 - clearing R4
+0001 100 100 1 01010 ; R4<--10   - add 10 to R4 to keep track of # int counted
+0101 101 101 1 00000 ; R5<--0	 - clearing R5
+0101 001 001 1 00000 ; R1<--0    - clearing R1 
+
+0110 001 011  000000 ; load  R1<--R3 - value from the loc in R3 to R1 
+0000 100 00000 0001  ; BrN - check and move to next val if value(R1) is neg
+0001 101 101 000 001 ; R5<- R1+R5 - if val is pos, add R1 to the existing value R5
+0001 011 011 1 00001 ; R3 <- R3 + 1 - increment R3 if value was added(pos)
+0001 100 100 1 11111 ; decrement the counter R4
+0000 001 111111010   ; BrP- if counter is pos, go back to load new val
+1111 0000 0010 0101  ; halt the program using trap
 
 ; The program description and code starts here
 
