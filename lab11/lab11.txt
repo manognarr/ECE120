@@ -1,9 +1,16 @@
 Question 1: Describe the errors that occur when trying to assemble lab11.asm. Identify the cause of each error.
-
+One of the errors was that there was an extra comma. Another  was the order of the nzp in the the BRnzp instruction(pz 
+instead of zp). One of the lines didn't have an operand(.ORIG) so that caused an error. A recurring error was when the
+label was not specified so the PCOffset couldn't be calculated. 
 
 
 Question 2: For each label in the code, write down the corresponding memory location. 
-
+INPUT: x300E 
+NEGATIVE: x3010
+ZERO: x300F
+RESULT: x3011
 
 
 Question 3: Between using labels and explicit memory locations/offsets, which one makes the most sense, and why?
+Labels are better because they allow for an easier understanding of the code compared to the memory locations
+or offsets. 
