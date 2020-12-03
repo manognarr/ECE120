@@ -20,7 +20,7 @@ ADD R1, R1, R1
 ADD R1, R1, R1
 ADD R1, R1, R1
 ADD R1, R1, R1
-
+ADD R2, R2, R1
 
 ADD R3, R3, #15 ; set row counter
 
