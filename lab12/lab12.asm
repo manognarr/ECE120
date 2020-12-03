@@ -3,6 +3,66 @@
 ; 8 bits (the high 8 bits, for your convenience) marking pixels in the
 ; line for that character.
 
+
+.ORIG x3000    ; program starts here 
+
+AND R0, R0, #0 ; clear register for output
+AND R3, R3, #0 ; clear reg
+AND R4, R4, #0 ; clear reg
+AND R6, R6, #0; clear reg
+AND R1, R1, #0 ; clear
+AND R2, R2, #0 ; clear
+
+LEA R2, FONT_DATA ; load the font data
+LDI R1, LETT_ADD ; load char into R1
+
+ADD R1, R1, R1
+ADD R1, R1, R1
+ADD R1, R1, R1
+ADD R1, R1, R1
+
+
+ADD R3, R3, #15 ; set row counter
+
+ 
+CHECKR 			    
+				ADD R3, R3, #0 ; placeholder
+				BRn STOP	; halt
+				ADD R4, R4, #8
+				LDR R1, R2, #0 ; load memory address into char 
+COLUMNN 
+				ADD R4, R4, #0
+				BRz  DONER       ; check if column is zero
+				ADD R1, R1, #0 ; 
+				BRn  PRINTONE
+				LDI R0, CHARFORZERO
+				OUT
+
+SHIFT 				ADD R1, R1, R1
+				ADD R4, R4, #-1
+				BRnzp COLUMNN
+ 
+DONER				 LD R0, NEW_LINE
+	  		 	 OUT
+			 	ADD R3, R3, #-1 
+				ADD R2, R2, #1
+				BRnzp CHECKR ;
+
+PRINTONE
+				LDI R0, CHARFORONE
+				OUT
+				BRnzp SHIFT 				
+
+
+CHARFORONE		       .FILL x5001
+CHARFORZERO		       .FILL x5000
+NEW_LINE		       .FILL x0A
+STOP  			        HALT 
+LETT_ADD		       .FILL  x5002 ; the label part
+
+
+
+
 FONT_DATA
 	.FILL	x0000
 	.FILL	x0000
@@ -4100,3 +4160,5 @@ FONT_DATA
 	.FILL	x0000
 	.FILL	x0000
 	.FILL	x0000
+
+.END
