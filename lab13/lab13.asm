@@ -1,7 +1,112 @@
-; The table below represents an 8x16 font.  For each 8-bit extended ASCII
-; character, the table uses 16 memory locations, each of which contains
-; 8 bits (the high 8 bits, for your convenience) marking pixels in the
-; line for that character.
+;This program uses registers and memory addresses
+;to print out a string where the characters of the 
+;string are stored in memory locations starting at 
+;x5002. The program finds where font data starts 
+;and uses the contents of the location of memory 
+;where the character is stored to compute how 
+;each character is going to be displayed in 
+;the output. It also uses branches and counters
+;to make sure that each letter is printed for 
+;8 columns and then moving onto the next row
+;with parts of multiple letters in each row. 
+;It then checks for a null value in the row
+;and once that is found, the program will either
+;go to the next row or halt if the number of 
+;rows displayed is 16. 
+
+;register list:
+;R3-the row counter 
+;R4-the column counter
+;R0-the output register
+;R1-the register with the
+  ;ascii value of the content from mem addr
+;R2-the address of the font data label
+;R7-used to decide where in font data the 
+  ;program is at 
+;R6-the character is loaded from memory addr
+;R5-the content of the memory addr
+
+.ORIG x3000            ; program starts here 
+AND R2, R2, #0         ; setting R2 to 0
+AND R3, R3, #0         ; Initialize R3 to 0
+ADD R3, R3, #0  
+       
+ADD R3, R3, #8         ; Add 8 to R3 for row counter
+ADD R3, R3, #8         ; add 8 to row counter = 16 
+ADD R0, R0, #0         ; setting R0 to 0
+AND R7, R7, #0         ; setting R7 to 0
+
+LD  R6, LETT_ADD       ; load the character address from mem addr
+GETADDRESS             ; finds the correct address in font data
+			LDR R1, R6, #0;        ; load from the mem of R6-> ascii val in R1
+			BRz DONER    		   ; null value is found --> end of the row
+			ADD R1, R1, R1         ; multiply it by 16 to find the correct 
+			ADD R1,R1, R1          ; place in font data using the correct char
+			ADD R1, R1, R1          
+			ADD R1, R1, R1          
+			LEA R2, FONT_DATA      ;puts the starting addr of font data in R2 
+
+NOT R7, R3             ; uses R7 and R3(16-row counter) to determine 
+ADD R7, R7, #1		   ; how much needs to be added to the font data
+ADD R7, R7, #8		   ; starting addr so that the correct letter is 
+ADD R7, R7, #8		   ; being outputted
+ADD R2, R1, R2         ; current font data according to the right letter
+ADD R2, R7, R2         ; adding what row to be printed to the font data addr
+
+LDR R5, R2, #0         ; putting the contents of the addr of R2 into R5
+AND R4, R4, #0         ; the column counter is set to 0
+ADD R4, R4, #8         ; column counter is set to 8
+
+COLUMNN
+			ADD R4, R4, #0       
+			BRz GETNEXTLETT       ; if the column counter is 0, go to the next letter
+
+DECIDEPRINT                 	  ; checks if the char for 1 or 0 needs to be displayed 
+			ADD R5, R5, #0        ; if the contents of the addr in font data are zero/pos
+			BRzp ZEROPRINT        ; have to print the char for 0(x5000)
+			LDI R0, CHARFORONE    ; it is a one otherwise, so char for 1 displayed
+			OUT                   
+			BRnzp SHIFT           ; the prog then moves onto the next bit in the 
+								  ; contents from the font data
+
+ZEROPRINT
+			LDI R0, CHARFORZERO    ; since the bit is 0, load into output reg
+			OUT                    ; and display the character at x5000
+
+SHIFT
+			ADD R5, R5, R5        ; checked one bit at a time, shift to left to go
+									;check the next bit
+			ADD R4, R4, #-1       ; once it is shifted, the next column is displayed
+			BRz COLUMNN 		  ; so the counter goes until 8 columns are displayed 
+			BRnzp DECIDEPRINT     ; if the bits are not all checked, go back to see if
+								  ; the next bit is a 0 or 1 
+DONER
+			LD R0, NEWLINE        ; once a row is done, a new line is printed 
+			OUT                   
+			LD R6, LETT_ADD		  ; at the end of the row the letters are restarted
+								  ; again(x5002-NULL)
+
+			ADD R3,R3, #-1        ; every time null is found, the row counter decrements
+			BRz STOP              ; if the row is zero, all the rows are displayed 
+			BRnzp GETADDRESS      ; of rows are not all displayed, then the prog goes
+								  ; to calculate the new R1 and R2(font data and character
+								  ; values)
+
+GETNEXTLETT
+			ADD R6, R6, #1        ; if a letter(every 8 columns) is completed, then the 
+								  ; the column is reset to 8 and starts again with a new 
+			ADD R4, R4, #8		  ; letter from a new addr
+			BRnzp GETADDRESS      ; goes to get new values for character and font data
+								  ; so the right characater and line from font data is 
+								  ; displayed 
+
+STOP                   HALT       ;end prog if all rows displayed
+CHARFORONE            .FILL x5001 ;char displayed if 1 is the bit
+CHARFORZERO           .FILL x5000 ;char displayed if 0 is the bit
+NEWLINE               .FILL XA    ;char for new line
+LETT_ADD              .FILL x5002 ;Character that should be displayed
+    
+
 
 FONT_DATA
 	.FILL	x0000
@@ -4100,3 +4205,8 @@ FONT_DATA
 	.FILL	x0000
 	.FILL	x0000
 	.FILL	x0000
+
+
+	.END
+
+
